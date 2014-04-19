@@ -3,11 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <Button x:Name="bt1" Content="Encrypt" HorizontalAlignment="Left" Margin="210,118,0,0" VerticalAlignment="Top" Width="75" Click="bt1_Click"/>
-        <Button x:Name="bt2" Content="Decrypt" HorizontalAlignment="Left" Margin="210,273,0,0" VerticalAlignment="Top" Width="75" Click="bt2_Click"/>
-        <Image Name="i1" HorizontalAlignment="Left" Height="100" Margin="24,10,0,0" VerticalAlignment="Top" Width="483"/>
-        <Image Name="i2" HorizontalAlignment="Left" Height="100" Margin="34,166,0,0" VerticalAlignment="Top" Width="162"/>
-        <TextBox Name="l1" HorizontalAlignment="Left" Margin="243,198,0,0" VerticalAlignment="Top" Width="250" Height="53"/>
+        <Button x:Name="bt1" Content="Encrypt" HorizontalAlignment="Left" Margin="260,39,0,0" VerticalAlignment="Top" Width="75" Click="bt1_Click"/>
+        <Image Name="i1" HorizontalAlignment="Left" Height="100" Margin="24,10,0,0" VerticalAlignment="Top" Width="147"/>
+        <TextBox Name="l1" HorizontalAlignment="Left" Margin="24,29,0,0" VerticalAlignment="Top" Width="111" Height="53"/>
+        <TextBox Name="lb1" Text="key -" HorizontalAlignment="Left" Margin="24,216,0,0" VerticalAlignment="Top" Width="468"/>
+        <TextBox Name="lb2" Text="iv -" HorizontalAlignment="Left" Margin="24,267,0,0" VerticalAlignment="Top" RenderTransformOrigin="-3.039,0.628" Width="468"/>
+        <TextBox Name="l2" HorizontalAlignment="Left" Height="52" Margin="24,137,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="111"/>
 
     </Grid>
 </Window>

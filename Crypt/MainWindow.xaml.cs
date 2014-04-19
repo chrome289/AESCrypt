@@ -27,37 +27,48 @@ namespace Crypt
             {
 
                 //string original = "d:\\wallpapers\\batman_arkham_origins_12-wallpaper-1366x768.jpg";
-                byte[] imageArray = File.ReadAllBytes("d:\\0.png");
+                byte[] imageArray = File.ReadAllBytes("d:\\Videos\\Battlefield 4 gameplay.avi");
+                //string s = System.Text.Encoding.ASCII.GetString(imageArray, 0, imageArray.Length);
+                //s = System.BitConverter.ToString(imageArray);
+                //l1.Text=s;
+                
+                    // Create a new instance of the RijndaelManaged 
+                    // class.  This generates a new key and initialization  
+                    // vector (IV). 
+                    using (RijndaelManaged myRijndael = new RijndaelManaged())
+                    {
 
-                string s = System.Text.Encoding.ASCII.GetString(imageArray, 0, imageArray.Length);
-                s = System.BitConverter.ToString(imageArray);
-                // Create a new instance of the RijndaelManaged 
-                // class.  This generates a new key and initialization  
-                // vector (IV). 
-                using (RijndaelManaged myRijndael = new RijndaelManaged())
-                {
+                        myRijndael.GenerateKey();
+                        myRijndael.GenerateIV();
+                        // Encrypt the string to an array of bytes. 
+                        byte[] encrypted = EncryptStringToBytes(imageArray, myRijndael.Key, myRijndael.IV);
+                        //string en = "d:\\en.avi";
+                        //File.WriteAllBytes(en, encrypted);
+                        imageArray.SetValue(null,0,imageArray.Length-1);
+                        GC.Collect();
+                        // Decrypt the bytes to a string. 
+                        //string roundtrip = DecryptStringFromBytes(encrypted, myRijndael.Key, myRijndael.IV);
+                        byte[] roundtrip = DecryptStringFromBytes(encrypted, myRijndael.Key, myRijndael.IV);
+                        //Display the original data and the decrypted data.
+                        //i1.Source=new BitmapImage(new Uri(@"d:\\0.png"));
+                        //l2.Text = roundtrip;
+                        //byte[] bytes = new byte[roundtrip.Length];
+                        //System.Buffer.BlockCopy(roundtrip.ToCharArray(), 0, bytes, 0, bytes.Length);
+                        string loc = "d:\\file.avi";
+                        File.WriteAllBytes(loc, roundtrip);
 
-                    myRijndael.GenerateKey();
-                    myRijndael.GenerateIV();
-                    // Encrypt the string to an array of bytes. 
-                    byte[] encrypted = EncryptStringToBytes(s, myRijndael.Key, myRijndael.IV);
-
-                    // Decrypt the bytes to a string. 
-                    //string roundtrip = DecryptStringFromBytes(encrypted, myRijndael.Key, myRijndael.IV);
-                    byte[] bytes = DecryptStringFromBytes(encrypted, myRijndael.Key, myRijndael.IV);
-                    //Display the original data and the decrypted data.
-                    i1.Source=new BitmapImage(new Uri(@"d:\\0.png"));
-
-                    //byte[] bytes = new byte[roundtrip.Length];
-                    //System.Buffer.BlockCopy(roundtrip.ToCharArray(), 0, bytes, 0, bytes.Length);
-                    string loc = "d:\\file.jpg";
-                    File.WriteAllBytes(loc, bytes);
-                    
-                    //s = System.Text.Encoding.ASCII.GetString(encrypted, 0, encrypted.Length);
-                    //s = System.BitConverter.ToString(encrypted);
-                    //l1.Text = roundtrip;
-                    i2.Source = new BitmapImage(new Uri(@"d:\\file.jpg"));
-                }
+                        for (int x = 0; x < myRijndael.Key.Length; x++)
+                            lb1.Text = lb1.Text + myRijndael.Key[x];
+                        for (int x = 0; x < myRijndael.IV.Length; x++)
+                            lb2.Text = lb2.Text + myRijndael.IV[x];
+                       // for (int x = 0; x < roundtrip.Length; x++)
+                         //   l2.Text = l2.Text + roundtrip[x];
+                        MessageBox.Show("done ");
+                        //s = System.Text.Encoding.ASCII.GetString(encrypted, 0, encrypted.Length);
+                        //s = System.BitConverter.ToString(encrypted);
+                        //l1.Text = roundtrip;
+                        //i2.Source = new BitmapImage(new Uri(@"d:\\file.jpg"));
+                    }
 
             }
             catch (Exception e)
@@ -65,11 +76,11 @@ namespace Crypt
                 Console.WriteLine("Error: {0}", e.Message);
             }
         }
-        static byte[] EncryptStringToBytes(string plainText, byte[] Key, byte[] IV)
+        static byte[] EncryptStringToBytes(byte[] message, byte[] Key, byte[] IV)
         {
-            // Check arguments. 
-            if (plainText == null || plainText.Length <= 0)
-                throw new ArgumentNullException("plainText");
+             //Check arguments. 
+            if (message == null || message.Length <= 0)
+                throw new ArgumentNullException("message");
             if (Key == null || Key.Length <= 0)
                 throw new ArgumentNullException("Key");
             if (IV == null || IV.Length <= 0)
@@ -90,20 +101,22 @@ namespace Crypt
                 {
                     using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        using (StreamWriter encrypt = new StreamWriter(csEncrypt))
                         {
 
                             //Write all data to the stream.
-                            swEncrypt.Write(plainText);
+                            csEncrypt.Write(message, 0, message.Length);
+                            csEncrypt.FlushFinalBlock();
+                            return msEncrypt.ToArray();
                         }
-                        encrypted = msEncrypt.ToArray();
+                        //encrypted = msEncrypt.ToArray();
                     }
                 }
             }
 
 
             // Return the encrypted bytes from the memory stream. 
-            return encrypted;
+            //return encrypted;
 
         }
 
@@ -122,7 +135,7 @@ namespace Crypt
             string plaintext = null;
 
             // Create an RijndaelManaged object 
-            byte[] decrypted;
+            //byte[] decrypted;
             // with the specified key and IV. 
             using (RijndaelManaged rijAlg = new RijndaelManaged())
             {
@@ -133,24 +146,18 @@ namespace Crypt
                 ICryptoTransform decryptor = rijAlg.CreateDecryptor(rijAlg.Key, rijAlg.IV);
 
                 // Create the streams used for decryption. 
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+                using (var stream = new MemoryStream())
+                //using (var decryptor = alg.CreateDecryptor())
+                using (var encrypt = new CryptoStream(stream, decryptor, CryptoStreamMode.Write))
                 {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-
-                            // Read the decrypted bytes from the decrypting stream 
-                            // and place them in a string. 
-                            //plaintext = srDecrypt.ReadToEnd();
-                        }
-                        decrypted = msDecrypt.ToArray();
-                    }
+                    encrypt.Write(cipherText, 0, cipherText.Length);
+                    encrypt.FlushFinalBlock();
+                    return stream.ToArray();
                 }
 
             }
 
-            return decrypted;
+            //return plaintext;
 
         }
 
