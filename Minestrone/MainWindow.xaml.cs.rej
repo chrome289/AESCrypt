@@ -1,0 +1,10 @@
+diff a/Crypt/MainWindow.xaml.cs b/Crypt/MainWindow.xaml.cs	(rejected hunks)
+@@ -135,7 +135,7 @@
+             string plaintext = null;
+ 
+             // Create an RijndaelManaged object 
+-            byte[] decrypted;
++            //byte[] decrypted;
+             // with the specified key and IV. 
+             using (RijndaelManaged rijAlg = new RijndaelManaged())
+             {
