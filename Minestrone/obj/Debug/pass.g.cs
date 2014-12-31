@@ -75,7 +75,7 @@ namespace Crypt {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Crypt;component/pass.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Minestrone;component/pass.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\pass.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

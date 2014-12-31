@@ -17,10 +17,13 @@ namespace Crypt
     public partial class MainWindow : Window
     {
         public static Process x;
-        public static string fg = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
+        public static string temp1,temp2 = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
         public static int keysize = settings.keysize; public static int block = settings.block; public static bool decomp = settings.decomp;
         public static int blo;
-        public static bool go = false,cmmdp=false;
+        public static bool go = false,cmmdp=false,v;
+        public static long val, numBytesRead, fileOffset;
+        public static double fac;
+        public static FileStream fs = null, fss1 = null;
         public MainWindow()
         {
             InitializeComponent();
@@ -31,7 +34,8 @@ namespace Crypt
             decomp = false;
         }
 
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        /* To move a borderless window
+         * private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -41,7 +45,10 @@ namespace Crypt
             {
                 MessageBox.Show(ex.ToString());
             }
-        }
+        }*/
+
+
+        //Encrytion method
         static byte[] EncryptStringToBytes(ref byte[] buffer, byte[] Key, byte[] IV, bool v)
         {
             Aes rijAlg = new AesCryptoServiceProvider();
@@ -64,7 +71,7 @@ namespace Crypt
             }
         }
 
-
+        //Decryption method
         static byte[] DecryptStringFromBytes(ref byte[] buffer, byte[] Key, byte[] IV, bool v)
         {
             Aes rijAlg = new AesCryptoServiceProvider();
@@ -89,79 +96,48 @@ namespace Crypt
 
         private void enc()
         {
-            // MessageBox.Show(keysize.ToString() + "    " + block.ToString());   
-            bool v; string fg1, loc; long val, numBytesRead, fileOffset; double fac;
-            Stopwatch st = new Stopwatch();
-            string[] f = new string[2];
-            byte[] salt = Encoding.ASCII.GetBytes("Some f**king salt");
-            Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
-            byte[] k = key.GetBytes(keysize / 8);
-            byte[] i = key.GetBytes(16);
-            FileStream fs = null, fss1 = null; string[] g = new string[2];
+            // MessageBox.Show(keysize.ToString() + "    " + block.ToString());
+            //Stopwatch st = new Stopwatch();
+            string[] temp = new string[2];
+            string[] g = new string[2];
             for (int y = 0; y < datagrid1.Items.Count; y++)
             {
+                pb1.Value = 0;  
                 try
                 {
-                Dispatcher.Invoke(() => datagrid1.SelectedIndex++, DispatcherPriority.Send);
-                Dispatcher.Invoke(() => fg = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                f = fg.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
-                g = f[1].Split(new string[] { " KB" }, StringSplitOptions.None);
-                Dispatcher.Invoke(() => pb1.Value = 0, DispatcherPriority.Send);
-                    
-                if(g[0]==" -1")
-                {
-                    Dispatcher.Invoke(() => pb1.Value = 0, DispatcherPriority.Send);
-                    Dispatcher.Invoke(() => fg = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                    f = fg.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
-                    //MessageBox.Show(pwd);
-                    g = f[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
-                    MessageBox.Show("g  "+g[0]);
-                    comp(g[0]);
-                    g[0] = g[0] + ".7z";
-                    MessageBox.Show("final  "+g[0]);
-                }
-                else
-                {
-                    Dispatcher.Invoke(() => fg = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                    f = fg.Split(new string[] { "Col3 =" }, StringSplitOptions.None);
-                    //MessageBox.Show(pwd);
-                    g = f[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+                    datagrid1.SelectedIndex++;
+                    temp2 = datagrid1.SelectedItem.ToString();
+                    temp = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
+                    g = temp[1].Split(new string[] { " KB" }, StringSplitOptions.None);
+                    pb1.Value = 0;
+                    if(g[0]==" -1")
+                    {
+                        temp2 = datagrid1.SelectedItem.ToString();
+                        temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
+                        g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+                        comp(g[0]);
+                        g[0] = g[0] + ".7z";
+                    }
+                    else
+                    {
+                        temp2 = datagrid1.SelectedItem.ToString();
+                        temp = temp2.Split(new string[] { "Col3 =" }, StringSplitOptions.None);
+                        //MessageBox.Show(pwd);
+                        g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
                     }
 
-                fg1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
-                
-                    Dispatcher.Invoke(() => lb1.Content = "Encrypting --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
+                    temp1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
+                    lb1.Content = "Encrypting --> " + Path.GetFileName(g[0]);
                     v = false;
-                    st.Start();
-                    fs = new FileStream(g[0], FileMode.Open);
-                    loc = g[0] + ".caes";
-                    fss1 = new FileStream(loc, FileMode.Append);
-                    val = 0; numBytesRead = 0; fileOffset = 0;
-                    fac = fs.Length / 100.00;
-                    while (fileOffset < fs.Length && go==true)
-                    {
-                        if ((fs.Length - fileOffset) < blo)
-                        {
-                            val = fs.Length - fileOffset;
-                            v = true;
-                        }
-                        else
-                            val = blo;
-                        byte[] buffer = new byte[val];
-                        fs.Seek(fileOffset, SeekOrigin.Begin);
-                        numBytesRead = fs.Read(buffer, 0, buffer.Length);
-                        fileOffset = fileOffset + numBytesRead;
-                        byte[] encrypted = EncryptStringToBytes(ref buffer, k, i, v);
-                        fss1.Write(encrypted, 0, encrypted.Length);
-                        buffer = null;
-                        encrypted = null;
-                        Dispatcher.Invoke(() => pb1.Value = fileOffset / fac, DispatcherPriority.Send);
-                    }
-                    fs = null; fss1 = null;
-                    st.Stop();
-                    GC.Collect();
-                    //SetWorkingSet(30000, 1000);
-                    //MessageBox.Show(st.ElapsedMilliseconds.ToString());
+                    //st.Start();
+                    
+                    BackgroundWorker bw = new BackgroundWorker();
+                    bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+                    bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
+                    bw.WorkerReportsProgress = true;
+                    bw.WorkerSupportsCancellation = true;
+                    bw.RunWorkerAsync(g[0]);
                 }
                 catch (FileNotFoundException e4)
                 {
@@ -182,29 +158,21 @@ namespace Crypt
                 }
                 finally
                 {
-                    if (fs != null)
-                    {
-                        fs.Close();
-                    }
-
-                    if (fss1 != null)
-                    {
-                        fss1.Close();
-                    }
+                    
                 }
 
             }
-            Dispatcher.Invoke(() => pb1.Value = 0, DispatcherPriority.Send);
-            Dispatcher.Invoke(() => datagrid1.Items.Clear(), DispatcherPriority.Send);
-            Dispatcher.Invoke(() => AnimateWindowHeight(this, 345.948), DispatcherPriority.Send);
-            Dispatcher.Invoke(() => lb1.Content = "", DispatcherPriority.Send);
-            Dispatcher.Invoke(() => bt1.IsEnabled = true, DispatcherPriority.Send);
-            Dispatcher.Invoke(() => bt2.IsEnabled = true, DispatcherPriority.Send);
-            Dispatcher.Invoke(() => bt3.IsEnabled = true, DispatcherPriority.Send);
-            Dispatcher.Invoke(() => bt4.IsEnabled = true, DispatcherPriority.Send);
+            pb1.Value = 0;
+            datagrid1.Items.Clear();
+            AnimateWindowHeight(this, 345.948);
+            lb1.Content = "";
+            bt1.IsEnabled = true;
+            bt2.IsEnabled = true;
+            bt3.IsEnabled = true;
+            bt4.IsEnabled = true;
             if (go == true)
             {
-                String sMessageBoxText = "Encrytion Complete \n\n"+"Time Taken "+st.ElapsedMilliseconds/1000+" seconds";
+                String sMessageBoxText = "Encrytion Complete \n\n"+"Time Taken "+"st.ElapsedMilliseconds/1000"+" seconds";
                 string sCaption = "Encryption";
                 MessageBoxButton btnMessageBox = MessageBoxButton.OK;
                 MessageBoxImage icnMessageBox = MessageBoxImage.Information;
@@ -219,6 +187,82 @@ namespace Crypt
                 MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
             }
             
+        }
+
+        private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //st.Stop();
+        }
+
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            byte[] salt = Encoding.ASCII.GetBytes("Some f**king salt");
+            Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
+            byte[] k = key.GetBytes(keysize / 8);
+            byte[] i = key.GetBytes(16);
+            string t = (string)e.Argument;
+            try
+            {
+                fs = new FileStream(t, FileMode.Open);
+                MessageBox.Show(fs.Length.ToString());
+                t = t + ".caes";
+                fss1 = new FileStream(t, FileMode.Create);
+                val = 0; numBytesRead = 0; fileOffset = 0;
+                fac = fs.Length / 100.00;
+                MessageBox.Show(fs.Length.ToString());
+                while (fileOffset < fs.Length && go == true)
+                {
+                    if ((fs.Length - fileOffset) < blo)
+                    {
+                        val = fs.Length - fileOffset;
+                        v = true;
+                    }
+                    else
+                        val = blo;
+                    byte[] buffer = new byte[val];
+                    fs.Seek(fileOffset, SeekOrigin.Begin);
+                    numBytesRead = fs.Read(buffer, 0, buffer.Length);
+                    fileOffset = fileOffset + numBytesRead;
+                    byte[] encrypted = EncryptStringToBytes(ref buffer, k, i, v);
+                    fss1.Write(encrypted, 0, encrypted.Length);
+                    buffer = null;
+                    encrypted = null;
+                    Dispatcher.Invoke(() => pb1.Value = fileOffset / fac, DispatcherPriority.Send);
+                }
+                if (fs != null)
+                {
+                    fs.Close();
+                }
+
+                if (fss1 != null)
+                {
+                    fss1.Close();
+                }
+            }
+            catch (FileNotFoundException e4)
+            {
+
+                String sMessageBoxText = "File Not Found  \n\n" + t;
+                string sCaption = "Encryption";
+                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
+                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
+                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+            }
+            catch (Exception e3)
+            {
+                String sMessageBoxText = "Some Random Error  \n\n" + e3;
+                string sCaption = "Encryption";
+                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
+                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
+                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+            }
+            fs = null; fss1 = null;
+            GC.Collect();
         }
 
 
@@ -236,16 +280,16 @@ namespace Crypt
                 try
                 {
                     Dispatcher.Invoke(() => datagrid1.SelectedIndex++, DispatcherPriority.Send);
-                    Dispatcher.Invoke(() => fg = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                    f = fg.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
+                    Dispatcher.Invoke(() => temp2 = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
+                    f = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
                     g = f[1].Split(new string[] { " KB" }, StringSplitOptions.None);
                     Dispatcher.Invoke(() => pb1.Value = 0, DispatcherPriority.Send);
 
                     if (g[0] == " -1")
                     {
                         Dispatcher.Invoke(() => pb1.Value = 0, DispatcherPriority.Send);
-                        Dispatcher.Invoke(() => fg = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                        f = fg.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
+                        Dispatcher.Invoke(() => temp2 = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
+                        f = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
                         //MessageBox.Show(pwd);
                         g = f[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
                         MessageBox.Show("g  " + g[0]);
@@ -255,8 +299,8 @@ namespace Crypt
                     }
                     else
                     {
-                        Dispatcher.Invoke(() => fg = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                        f = fg.Split(new string[] { "Col3 =" }, StringSplitOptions.None);
+                        Dispatcher.Invoke(() => temp2 = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
+                        f = temp2.Split(new string[] { "Col3 =" }, StringSplitOptions.None);
                         //MessageBox.Show(pwd);
                         g = f[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
 
@@ -414,11 +458,7 @@ namespace Crypt
                     bt3.IsEnabled = false;
                     bt4.IsEnabled = false;
                     AnimateWindowHeight(this, 490.994);
-                    Thread newThread = new Thread(new ThreadStart(enc));
-                    newThread.IsBackground = true;
-                    newThread.SetApartmentState(ApartmentState.STA); 
-                    newThread.Priority = System.Threading.ThreadPriority.Highest;
-                    newThread.Start();
+                    enc();
                 }
             }
             else
