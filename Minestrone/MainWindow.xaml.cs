@@ -4,12 +4,12 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 namespace Crypt
@@ -17,23 +17,23 @@ namespace Crypt
     public partial class MainWindow : Window
     {
         public static Process x;
-        public static string temp1,temp2 = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
+        public static string temp1, temp2 = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
         public static int keysize = settings.keysize; public static int block = settings.block; public static bool decomp = settings.decomp;
         public static int blo;
-        public static bool go = false,cmmdp=false,v;
+        public static bool go = false, cmmdp = false, v;
         public static long val, numBytesRead, fileOffset;
         public static double fac;
         public static FileStream fs = null, fss1 = null;
+        public static Stopwatch st=new Stopwatch();
         public MainWindow()
         {
             InitializeComponent();
-           // SetWorkingSet(30000,10000);
             keysize = 256;
             blo = 16640000;
             block = 1;
             decomp = false;
         }
-
+        
         /* To move a borderless window
          * private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -94,54 +94,137 @@ namespace Crypt
             }
         }
 
+        //started a background thread to encrypt
         private void enc()
         {
-            // MessageBox.Show(keysize.ToString() + "    " + block.ToString());
-            //Stopwatch st = new Stopwatch();
+            st.Start();
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
+            bw.WorkerReportsProgress = true;
+            bw.WorkerSupportsCancellation = true;
+            bw.RunWorkerAsync();
+        }
+
+        //updating progress
+        private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            pb1.Value = e.ProgressPercentage;
+        }
+
+        //run after background thread exists
+        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            st.Stop();
+            pb1.Value = 0;
+            datagrid1.Items.Clear();
+            AnimateWindowHeight(this, 345.948);
+            lb1.Content = "";
+            bt1.IsEnabled = true;
+            bt2.IsEnabled = true;
+            bt3.IsEnabled = true;
+            bt4.IsEnabled = true;
+            if (go == true)
+            {
+                String sMessageBoxText = "Encrytion Complete \n\n" + "Time Taken " + st.ElapsedMilliseconds/1000 + " seconds";
+                string sCaption = "Encryption";
+                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
+                MessageBoxImage icnMessageBox = MessageBoxImage.Information;
+                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+            }
+            else
+            {
+                String sMessageBoxText = "Encrytion Interrupted";
+                string sCaption = "Encryption";
+                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
+                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
+                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+            }
+            GC.Collect();
+        }
+
+        //main background thread
+        private void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
             string[] temp = new string[2];
             string[] g = new string[2];
             for (int y = 0; y < datagrid1.Items.Count; y++)
             {
-                pb1.Value = 0;  
+                worker.ReportProgress(0);
+
+                //parsing the file name and location
+                Dispatcher.Invoke(() => datagrid1.SelectedIndex++, DispatcherPriority.Send); 
+                Dispatcher.Invoke(() => temp2 = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send); 
+                temp = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
+                g = temp[1].Split(new string[] { " KB" }, StringSplitOptions.None);
+                //zip if selection is a folder
+                if (g[0] == " -1")
+                {
+                    temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
+                    g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+                    comp(g[0]);
+                    g[0] = g[0] + ".7z";
+                }
+                else
+                {
+                    temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
+                    g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+                }
+                temp1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
+                Dispatcher.Invoke(() => lb1.Content = "Encrypting --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
+
+                //preparing salt and ley for encryption
+                v = false;
+                byte[] salt = Encoding.ASCII.GetBytes("Some f**king salt");
+                Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
+                byte[] k = key.GetBytes(keysize / 8);
+                byte[] i = key.GetBytes(16);
                 try
                 {
-                    datagrid1.SelectedIndex++;
-                    temp2 = datagrid1.SelectedItem.ToString();
-                    temp = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
-                    g = temp[1].Split(new string[] { " KB" }, StringSplitOptions.None);
-                    pb1.Value = 0;
-                    if(g[0]==" -1")
+                    //opening I/O streams
+                    fs = new FileStream(g[0], FileMode.Open);
+                    g[0] = g[0] + ".caes";
+                    fss1 = new FileStream(g[0], FileMode.Create);
+                    val = 0; numBytesRead = 0; fileOffset = 0;
+                    fac = fs.Length / 100.00;
+
+                    //encryption
+                    while (fileOffset < fs.Length && go == true)
                     {
-                        temp2 = datagrid1.SelectedItem.ToString();
-                        temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
-                        g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
-                        comp(g[0]);
-                        g[0] = g[0] + ".7z";
+                        if ((fs.Length - fileOffset) < blo)
+                        {
+                            val = fs.Length - fileOffset;
+                            v = true;
+                        }
+                        else
+                            val = blo;
+                        byte[] buffer = new byte[val];
+                        fs.Seek(fileOffset, SeekOrigin.Begin);
+                        numBytesRead = fs.Read(buffer, 0, buffer.Length);
+                        fileOffset = fileOffset + numBytesRead;
+                        byte[] encrypted = EncryptStringToBytes(ref buffer, k, i, v);
+                        fss1.Write(encrypted, 0, encrypted.Length);
+                        buffer = null;
+                        encrypted = null;
+                        worker.ReportProgress((int)(fileOffset / fac));
                     }
-                    else
+                    
+                    //closing I/O streams
+                    if (fs != null)
                     {
-                        temp2 = datagrid1.SelectedItem.ToString();
-                        temp = temp2.Split(new string[] { "Col3 =" }, StringSplitOptions.None);
-                        //MessageBox.Show(pwd);
-                        g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+                        fs.Close();
                     }
 
-                    temp1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
-                    lb1.Content = "Encrypting --> " + Path.GetFileName(g[0]);
-                    v = false;
-                    //st.Start();
-                    
-                    BackgroundWorker bw = new BackgroundWorker();
-                    bw.DoWork += new DoWorkEventHandler(bw_DoWork);
-                    bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
-                    bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
-                    bw.WorkerReportsProgress = true;
-                    bw.WorkerSupportsCancellation = true;
-                    bw.RunWorkerAsync(g[0]);
+                    if (fss1 != null)
+                    {
+                        fss1.Close();
+                    }
                 }
                 catch (FileNotFoundException e4)
                 {
-                    
+
                     String sMessageBoxText = "File Not Found  \n\n" + g[0];
                     string sCaption = "Encryption";
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
@@ -156,115 +239,9 @@ namespace Crypt
                     MessageBoxImage icnMessageBox = MessageBoxImage.Error;
                     MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
                 }
-                finally
-                {
-                    
-                }
-
+                fs = null; fss1 = null;
             }
-            pb1.Value = 0;
-            datagrid1.Items.Clear();
-            AnimateWindowHeight(this, 345.948);
-            lb1.Content = "";
-            bt1.IsEnabled = true;
-            bt2.IsEnabled = true;
-            bt3.IsEnabled = true;
-            bt4.IsEnabled = true;
-            if (go == true)
-            {
-                String sMessageBoxText = "Encrytion Complete \n\n"+"Time Taken "+"st.ElapsedMilliseconds/1000"+" seconds";
-                string sCaption = "Encryption";
-                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
-                MessageBoxImage icnMessageBox = MessageBoxImage.Information;
-                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
-            }
-            else
-            {
-                String sMessageBoxText = "Encrytion Interrupted";
-                string sCaption = "Encryption";
-                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
-                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
-                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
-            }
-            
         }
-
-        private void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            //st.Stop();
-        }
-
-        private void bw_DoWork(object sender, DoWorkEventArgs e)
-        {
-            byte[] salt = Encoding.ASCII.GetBytes("Some f**king salt");
-            Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
-            byte[] k = key.GetBytes(keysize / 8);
-            byte[] i = key.GetBytes(16);
-            string t = (string)e.Argument;
-            try
-            {
-                fs = new FileStream(t, FileMode.Open);
-                MessageBox.Show(fs.Length.ToString());
-                t = t + ".caes";
-                fss1 = new FileStream(t, FileMode.Create);
-                val = 0; numBytesRead = 0; fileOffset = 0;
-                fac = fs.Length / 100.00;
-                MessageBox.Show(fs.Length.ToString());
-                while (fileOffset < fs.Length && go == true)
-                {
-                    if ((fs.Length - fileOffset) < blo)
-                    {
-                        val = fs.Length - fileOffset;
-                        v = true;
-                    }
-                    else
-                        val = blo;
-                    byte[] buffer = new byte[val];
-                    fs.Seek(fileOffset, SeekOrigin.Begin);
-                    numBytesRead = fs.Read(buffer, 0, buffer.Length);
-                    fileOffset = fileOffset + numBytesRead;
-                    byte[] encrypted = EncryptStringToBytes(ref buffer, k, i, v);
-                    fss1.Write(encrypted, 0, encrypted.Length);
-                    buffer = null;
-                    encrypted = null;
-                    Dispatcher.Invoke(() => pb1.Value = fileOffset / fac, DispatcherPriority.Send);
-                }
-                if (fs != null)
-                {
-                    fs.Close();
-                }
-
-                if (fss1 != null)
-                {
-                    fss1.Close();
-                }
-            }
-            catch (FileNotFoundException e4)
-            {
-
-                String sMessageBoxText = "File Not Found  \n\n" + t;
-                string sCaption = "Encryption";
-                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
-                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
-                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
-            }
-            catch (Exception e3)
-            {
-                String sMessageBoxText = "Some Random Error  \n\n" + e3;
-                string sCaption = "Encryption";
-                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
-                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
-                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
-            }
-            fs = null; fss1 = null;
-            GC.Collect();
-        }
-
 
 
         private void dec()
@@ -273,7 +250,7 @@ namespace Crypt
             Stopwatch st = new Stopwatch();
             Dispatcher.Invoke(() => datagrid1.SelectedIndex = 0, DispatcherPriority.Send);
             string[] f = new string[2]; string[] g = new string[2];
-            bool v; string fg1, loc; long val, numBytesRead, fileOffset; double fac;string deloc;
+            bool v; string fg1, loc; long val, numBytesRead, fileOffset; double fac; string deloc;
             for (int y = 0; y < datagrid1.Items.Count; y++)
             {
                 FileStream fs = null, fss2 = null; fg1 = "";
@@ -323,7 +300,7 @@ namespace Crypt
                         deloc = fg1;
                         MessageBox.Show(fg1);
                         fss2 = new FileStream(deloc, FileMode.Append);
-                        while (fileOffset < fs.Length && go==true)
+                        while (fileOffset < fs.Length && go == true)
                         {
                             if ((fs.Length - fileOffset) < blo)
                             {
@@ -342,7 +319,7 @@ namespace Crypt
                         }
                         fss2.Close();
                         st.Stop();
-                        if(decomp==true)
+                        if (decomp == true)
                         {
                             decom(fg1);
                         }
@@ -470,7 +447,7 @@ namespace Crypt
                 if (passw == true)
                 {
                     go = true;
-                    bt1.IsEnabled = false; 
+                    bt1.IsEnabled = false;
                     bt2.IsEnabled = false;
                     bt3.IsEnabled = false;
                     bt4.IsEnabled = false;
@@ -491,7 +468,7 @@ namespace Crypt
                 datagrid1.Items.Clear();
                 bt6.IsEnabled = true;
             }
-            catch (Exception )
+            catch (Exception)
             {
 
             }
@@ -581,14 +558,14 @@ namespace Crypt
             VistaFolderBrowserDialog ofd = new VistaFolderBrowserDialog();
             ofd.ShowDialog();
             string fold = ofd.SelectedPath;
-            if(fold!="")
+            if (fold != "")
             {
                 int v = 0, h; h = datagrid1.Items.Count;
                 String file = fold;
                 v++; h++;
                 FileInfo info = new FileInfo(file);
-                datagrid1.Items.Add(new { Col1 = h, Col2 = fold, Col3 = file, Col4 = -1 + " KB" });        
-            } 
+                datagrid1.Items.Add(new { Col1 = h, Col2 = fold, Col3 = file, Col4 = -1 + " KB" });
+            }
         }
         public void comp(String fold)
         {
@@ -600,7 +577,7 @@ namespace Crypt
             MessageBox.Show("a " + targetName + sourceName + " -r -mx9 -t7z");
             x.StartInfo.WorkingDirectory = @"c:";
             x.StartInfo.FileName = "7za.exe";
-            x.StartInfo.Arguments = "a " + targetName  + sourceName + " -r -mx9 -t7z";
+            x.StartInfo.Arguments = "a " + targetName + sourceName + " -r -mx9 -t7z";
             x.Start();
             x.WaitForExit();
             cmmdp = false;
@@ -623,7 +600,7 @@ namespace Crypt
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             MessageBox.Show(cmmdp.ToString());
-            if(cmmdp==true)
+            if (cmmdp == true)
                 x.Close();
         }
     }
