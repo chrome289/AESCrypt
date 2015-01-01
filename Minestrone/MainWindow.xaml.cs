@@ -242,7 +242,10 @@ namespace Crypt
                     MessageBoxImage icnMessageBox = MessageBoxImage.Error;
                     MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
                 }
-                fs = null; fss1 = null;
+                finally
+                {
+                    fs = null; fss1 = null;
+                }
             }
         }
 
@@ -390,6 +393,18 @@ namespace Crypt
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
                     MessageBoxImage icnMessageBox = MessageBoxImage.Error;
                     MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+                }
+                finally
+                {
+                    if (fs != null)
+                    {
+                        fs.Close();
+                    }
+
+                    if (fss1 != null)
+                    {
+                        fss1.Close();
+                    }
                 }
             }
         }
