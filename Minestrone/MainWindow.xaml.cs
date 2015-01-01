@@ -324,7 +324,7 @@ namespace Crypt
 
                     //opening I/O streams
                     fs = new FileStream(g[0], FileMode.Open);
-                    g[0] = g[0].Remove(g[0].Length - 4);
+                    g[0] = g[0].Remove(g[0].Length - 5);
                     if(!File.Exists(g[0]))
                     {
                         fss1 = new FileStream(g[0], FileMode.Create);
@@ -349,7 +349,6 @@ namespace Crypt
                             fss1.Write(roundtrip, 0, roundtrip.Length);
                             worker.ReportProgress((int)(fileOffset / fac));
                         }
-
                         //closing I/O streams
                         if (fs != null)
                         {
@@ -360,11 +359,12 @@ namespace Crypt
                         {
                             fss1.Close();
                         }
-
-                        if (decomp == true)
+                        MessageBox.Show(g[0] + "      " + Path.GetExtension(g[0]).ToString());
+                        if (Path.GetExtension(g[0]) == ".7z" && decomp == true)
                         {
-                            //decom(fg1);
+                            decom(g[0]);
                         }
+                        
                     }
                     else
                     {
@@ -570,9 +570,8 @@ namespace Crypt
         {
             string sourceName = "\"" + fold + "\"";
             string targetName = "\"" + fold + ".7z" + "\"";
-            string temp = " a " + targetName + " " + sourceName + " -mx9 -t7z";
             cmmdp = true;
-            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a "+ targetName + " " + sourceName + " -mx9 -t7z");
+            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a " + targetName + " " + sourceName + " -mx9 -t7z");
             //processStartInfo.UseShellExecute = false;
             //processStartInfo.CreateNoWindow = true;
             process = Process.Start(processStartInfo);
@@ -581,17 +580,17 @@ namespace Crypt
         }
         public void decom(String fold)
         {
-            //MessageBox.Show("flolil " + fold);
+            MessageBox.Show("flolil " + fold);
             string sourceName = "\"" + fold + "\"";
-            fold = fold.Remove(fold.Length - 3);
-            string targetName = "\"" + fold + "\"";
-            //MessageBox.Show("99"+sourceName + "999" + targetName+"99");
+            string targetName = "\""+Path.GetDirectoryName(fold)+"\"";
             cmmdp = true;
-            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o " + targetName);
+            MessageBox.Show("/c 7za x " + sourceName + " -o" + targetName);
+            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o" + targetName);
             //processStartInfo.UseShellExecute = false;
             //processStartInfo.CreateNoWindow = true;
             process = Process.Start(processStartInfo);
             process.WaitForExit();
+            File.Delete(fold);
             cmmdp = false;
         }
 
