@@ -572,8 +572,8 @@ namespace Crypt
             string targetName = "\"" + fold + ".7z" + "\"";
             cmmdp = true;
             processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a " + targetName + " " + sourceName + " -mx9 -t7z");
-            //processStartInfo.UseShellExecute = false;
-            //processStartInfo.CreateNoWindow = true;
+            processStartInfo.UseShellExecute = false;
+            processStartInfo.CreateNoWindow = true;
             process = Process.Start(processStartInfo);
             process.WaitForExit();
             cmmdp = false;
@@ -586,8 +586,8 @@ namespace Crypt
             cmmdp = true;
             MessageBox.Show("/c 7za x " + sourceName + " -o" + targetName);
             processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o" + targetName);
-            //processStartInfo.UseShellExecute = false;
-            //processStartInfo.CreateNoWindow = true;
+            processStartInfo.UseShellExecute = false;
+            processStartInfo.CreateNoWindow = true;
             process = Process.Start(processStartInfo);
             process.WaitForExit();
             File.Delete(fold);
