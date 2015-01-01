@@ -18,12 +18,29 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+
+        </Style>
+        <Style TargetType="{x:Type DataGridRow}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontWeight" Value="Thin"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#4A4D49"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FF262626"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
     <Grid Background="WhiteSmoke">
 
-        <Border BorderBrush="#FFB4A6A6" BorderThickness="1" Height="265" Margin="370,26,0,0" VerticalAlignment="Top" CornerRadius="10" HorizontalAlignment="Left" Width="125">
+        <Border BorderBrush="#FFB4A6A6" BorderThickness="1" Height="265" Margin="370,26,22,0" VerticalAlignment="Top" CornerRadius="10">
             <Border.Effect>
                 <DropShadowEffect Color="#FFC1BCBC" Direction="300" RenderingBias="Quality" ShadowDepth="3"/>
             </Border.Effect>
@@ -37,30 +54,9 @@
 
         <Button x:Name="bt1" Content="Add Files" Margin="390,85,0,0" VerticalAlignment="Top" Click="Button_Click" BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="24" HorizontalAlignment="Left" Width="85">
             <Button.Effect>
-                <DropShadowEffect Color="#FFE2E2E2" Direction="300" RenderingBias="Quality"/>
+                <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
-        <!--<ListView x:Name="datagrid1" HorizontalAlignment="Left" Height="186" Margin="608,92,-384,0" VerticalAlignment="Top" Width="302" BorderThickness="2" BorderBrush="#FFE8DDDD">
-            <ListView.Effect>
-                <DropShadowEffect BlurRadius="20" Color="#FFC1BCBC" Direction="300" RenderingBias="Quality" ShadowDepth="3"/>
-            </ListView.Effect>
-            <ListView.View>
-                <GridView>
-                    <GridView.ColumnHeaderContainerStyle>
-                        <Style TargetType="GridViewColumnHeader">
-                            <Setter Property="Height"  Value="20"  />
-                        </Style>
-                    </GridView.ColumnHeaderContainerStyle>
-                    <GridViewColumn Header="S. No." Width=" 40" DisplayMemberBinding="{Binding Col1}"/>
-                    <GridViewColumn Header="File Name" Width="170" DisplayMemberBinding="{Binding Col2}"/>
-                    <GridViewColumn Header="Size" Width="70" DisplayMemberBinding="{Binding Col4}"/>
-                    <GridViewColumn Header="" Width="0" DisplayMemberBinding="{Binding Col3}"/>
-                </GridView>
-
-            </ListView.View>
-            
-        </ListView>-->
-
         <RadioButton x:Name="rb1" Content="Encryption" HorizontalAlignment="Left" Margin="390,200,0,0" VerticalAlignment="Top" IsChecked="True" Checked="rb1_Checked" Width="93" FontFamily="Ebrima">
             <RadioButton.Effect>
                 <DropShadowEffect Color="#FFD1D1D1" Direction="300"/>
@@ -79,23 +75,23 @@
 
         <Button x:Name="bt2" Content="Begin" Margin="149,265,287,0" VerticalAlignment="Top" Click="bt2_Click_1" BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
             <Button.Effect>
-                <DropShadowEffect Color="#FFE2E2E2" Direction="300" RenderingBias="Quality"/>
+                <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
 
         <Button x:Name="bt4" Content="Settings" Margin="29,265,407,0" VerticalAlignment="Top" Click="bt4_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
             <Button.Effect>
-                <DropShadowEffect Color="#FFE2E2E2" Direction="300" RenderingBias="Quality"/>
+                <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
 
         <Button x:Name="bt3" Content="Delete Files" Margin="390,130,0,0" VerticalAlignment="Top" Click="bt3_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="24" HorizontalAlignment="Left" Width="85">
             <Button.Effect>
-                <DropShadowEffect Color="#FFE2E2E2" Direction="300" RenderingBias="Quality"/>
+                <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
 
-        <DataGrid x:Name="datagrid1" AllowDrop="True" Drop="datagrid1_Drop"  AlternatingRowBackground="LightSkyBlue" AutoGenerateColumns="False" HorizontalContentAlignment="Center" CanUserAddRows="False" LoadingRowDetails="datagrid1_LoadingRowDetails"  LoadingRow="DataGrid_LoadingRow" HorizontalAlignment="Left"  Margin="29,26,0,0" VerticalAlignment="Top" Height="211" Width="318" FontFamily="Ebrima">
+        <DataGrid x:Name="datagrid1" AllowDrop="True" Drop="datagrid1_Drop" AutoGenerateColumns="False" HorizontalContentAlignment="Center" CanUserAddRows="False" LoadingRowDetails="datagrid1_LoadingRowDetails"  LoadingRow="DataGrid_LoadingRow" HorizontalAlignment="Left"  Margin="20,26,0,0" VerticalAlignment="Top" Height="211" Width="327" FontFamily="Ebrima">
             <DataGrid.Effect>
                 <DropShadowEffect BlurRadius="20" Color="#FFC1BCBC" Direction="300" RenderingBias="Quality" ShadowDepth="3"/>
             </DataGrid.Effect>
@@ -108,12 +104,12 @@
         </DataGrid>
         <Button x:Name="bt5" Content="Stop" Margin="267,265,170,0" VerticalAlignment="Top" Click="bt5_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
             <Button.Effect>
-                <DropShadowEffect Color="#FFE2E2E2" Direction="300" RenderingBias="Quality"/>
+                <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
         <Button x:Name="bt6" Content="Add Folder" Margin="390,41,0,0" VerticalAlignment="Top" Click="bt6_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="24" Width="85" HorizontalAlignment="Left">
             <Button.Effect>
-                <DropShadowEffect Color="#FFE2E2E2" Direction="300" RenderingBias="Quality"/>
+                <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
     </Grid>

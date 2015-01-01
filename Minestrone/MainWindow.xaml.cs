@@ -12,11 +12,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.IO.Compression;
+using SevenZip.Sdk.Compression.Lzma;
+using SevenZip;
+
 namespace Crypt
 {
     public partial class MainWindow : Window
     {
-        public static Process x;
+        public static Process x; public static ProcessStartInfo processStartInfo;
+        public static Process process;
         public static string temp1, temp2 = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
         public static int keysize = settings.keysize; public static int block = settings.block; public static bool decomp = settings.decomp;
         public static int blo;
@@ -162,7 +167,7 @@ namespace Crypt
                 {
                     temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
                     g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
-                    //comp(g[0]);
+                    comp(g[0]);
                     g[0] = g[0] + ".7z";
                 }
                 else
@@ -356,7 +361,6 @@ namespace Crypt
                             fss1.Close();
                         }
 
-
                         if (decomp == true)
                         {
                             //decom(fg1);
@@ -435,10 +439,7 @@ namespace Crypt
                 if (passw == true)
                 {
                     go = true;
-                    bt1.IsEnabled = false;
-                    bt2.IsEnabled = false;
-                    bt3.IsEnabled = false;
-                    bt4.IsEnabled = false;
+                    bt1.IsEnabled = false; bt2.IsEnabled = false; bt3.IsEnabled = false; bt4.IsEnabled = false; 
                     AnimateWindowHeight(this, 490.994);
                     enc();
                 }
@@ -452,10 +453,7 @@ namespace Crypt
                 if (passw == true)
                 {
                     go = true;
-                    bt1.IsEnabled = false;
-                    bt2.IsEnabled = false;
-                    bt3.IsEnabled = false;
-                    bt4.IsEnabled = false;
+                    bt1.IsEnabled = false; bt2.IsEnabled = false; bt3.IsEnabled = false; bt4.IsEnabled = false;
                     AnimateWindowHeight(this, 490.994);
                     dec();
                 }
@@ -570,17 +568,15 @@ namespace Crypt
         }
         public void comp(String fold)
         {
-            //MessageBox.Show("flolil "+fold);
             string sourceName = "\"" + fold + "\"";
-            string targetName = "\"" + fold + ".7z" + "\" ";
-            MessageBox.Show(sourceName + "        " + targetName);
+            string targetName = "\"" + fold + ".7z" + "\"";
+            string temp = " a " + targetName + " " + sourceName + " -mx9 -t7z";
             cmmdp = true;
-            MessageBox.Show("a " + targetName + sourceName + " -r -mx9 -t7z");
-            x.StartInfo.WorkingDirectory = @"c:";
-            x.StartInfo.FileName = "7za.exe";
-            x.StartInfo.Arguments = "a " + targetName + sourceName + " -r -mx9 -t7z";
-            x.Start();
-            x.WaitForExit();
+            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a "+ targetName + " " + sourceName + " -mx9 -t7z");
+            //processStartInfo.UseShellExecute = false;
+            //processStartInfo.CreateNoWindow = true;
+            process = Process.Start(processStartInfo);
+            process.WaitForExit();
             cmmdp = false;
         }
         public void decom(String fold)
@@ -591,10 +587,11 @@ namespace Crypt
             string targetName = "\"" + fold + "\"";
             //MessageBox.Show("99"+sourceName + "999" + targetName+"99");
             cmmdp = true;
-            x.StartInfo.FileName = "C:\\Users\\Siddharth\\Desktop\\7za.exe";
-            x.StartInfo.Arguments = @"x " + sourceName + " -o" + targetName;
-            x.Start();
-            x.WaitForExit();
+            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o " + targetName);
+            //processStartInfo.UseShellExecute = false;
+            //processStartInfo.CreateNoWindow = true;
+            process = Process.Start(processStartInfo);
+            process.WaitForExit();
             cmmdp = false;
         }
 
