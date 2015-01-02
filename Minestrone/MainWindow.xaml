@@ -10,21 +10,19 @@
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
                         <Grid Background="{TemplateBinding Background}">
                             <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
-                            <Border Padding="4">
+                            <Border Padding="8">
                                 <ContentPresenter />
                             </Border>
                         </Grid>
-
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
         </Style>
         <Style TargetType="{x:Type DataGridRow}">
             <Setter Property="Height" Value="30"/>
             <Setter Property="FontSize" Value="11"/>
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontWeight" Value="Thin"/>
+            <Setter Property="FontFamily" Value="Ebrima"/>
+            <Setter Property="FontWeight" Value="Light"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -40,7 +38,7 @@
 
     <Grid Background="WhiteSmoke">
 
-        <Border BorderBrush="#FFB4A6A6" BorderThickness="1" Height="265" Margin="370,26,22,0" VerticalAlignment="Top" CornerRadius="10">
+        <Border BorderBrush="#FFB4A6A6" BorderThickness="1" Height="265" Margin="371,26,0,0" VerticalAlignment="Top" CornerRadius="10" HorizontalAlignment="Left" Width="124">
             <Border.Effect>
                 <DropShadowEffect Color="#FFC1BCBC" Direction="300" RenderingBias="Quality" ShadowDepth="3"/>
             </Border.Effect>
@@ -73,13 +71,13 @@
 
         <Label x:Name="lb1" Content="..." HorizontalAlignment="Left" Margin="40,335,0,-53" VerticalContentAlignment="Center" VerticalAlignment="Top" Height="35" Width="435" FontFamily="Ebrima" FontSize="13" />
 
-        <Button x:Name="bt2" Content="Begin" Margin="149,265,287,0" VerticalAlignment="Top" Click="bt2_Click_1" BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
+        <Button x:Name="bt2" Content="Begin" Margin="144,265,292,0" VerticalAlignment="Top" Click="bt2_Click_1" BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
             <Button.Effect>
                 <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
         </Button>
 
-        <Button x:Name="bt4" Content="Settings" Margin="29,265,407,0" VerticalAlignment="Top" Click="bt4_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
+        <Button x:Name="bt4" Content="Settings" Margin="20,265,416,0" VerticalAlignment="Top" Click="bt4_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
             <Button.Effect>
                 <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>
@@ -91,18 +89,18 @@
             </Button.Effect>
         </Button>
 
-        <DataGrid x:Name="datagrid1" AllowDrop="True" Drop="datagrid1_Drop" AutoGenerateColumns="False" HorizontalContentAlignment="Center" CanUserAddRows="False" LoadingRowDetails="datagrid1_LoadingRowDetails"  LoadingRow="DataGrid_LoadingRow" HorizontalAlignment="Left"  Margin="20,26,0,0" VerticalAlignment="Top" Height="211" Width="327" FontFamily="Ebrima">
+        <DataGrid x:Name="datagrid1" Background="#4A4D49" AllowDrop="True" Drop="datagrid1_Drop" AutoGenerateColumns="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" CanUserAddRows="False" LoadingRowDetails="datagrid1_LoadingRowDetails"  LoadingRow="DataGrid_LoadingRow" HorizontalAlignment="Left"  Margin="20,26,100,40" VerticalAlignment="Top" Height="211" Width="327" FontFamily="Ebrima" GridLinesVisibility="Horizontal" SnapsToDevicePixels="False" MinColumnWidth="40" AreRowDetailsFrozen="True" FontWeight="Thin" TextOptions.TextHintingMode="Fixed" HeadersVisibility="Column" IsReadOnly="True" HorizontalGridLinesBrush="#FFFFF379">
             <DataGrid.Effect>
                 <DropShadowEffect BlurRadius="20" Color="#FFC1BCBC" Direction="300" RenderingBias="Quality" ShadowDepth="3"/>
             </DataGrid.Effect>
             <DataGrid.Columns >
-                <DataGridTextColumn Header="S. No." Width="0" MaxWidth="0" CanUserResize="False" Binding="{Binding Col1}"/>
+                <DataGridTextColumn Header="S. No." Width="40" CellStyle="{StaticResource CenterAlignedCellStyle}"  CanUserResize="False" Binding="{Binding Col1}"/>
                 <DataGridTextColumn Header="    File Name" CellStyle="{StaticResource CenterAlignedCellStyle}"  Width="210" Binding="{Binding Col2}"/>
                 <DataGridTextColumn Header="" CanUserResize="False" Width="0" MaxWidth="0" Binding="{Binding Col3}"/>
                 <DataGridTextColumn Header="    Size" CellStyle="{StaticResource CenterAlignedCellStyle}" Width="110"  Binding="{Binding Col4}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="bt5" Content="Stop" Margin="267,265,170,0" VerticalAlignment="Top" Click="bt5_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13">
+        <Button x:Name="bt5" Content="Stop" Margin="266,265,0,0" VerticalAlignment="Top" Click="bt5_Click"  BorderBrush="#FFD6DCD9" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="26" FontSize="13" HorizontalAlignment="Left" Width="81">
             <Button.Effect>
                 <DropShadowEffect Color="#FFE2E2E2" Direction="330" RenderingBias="Quality" Opacity="0.9" ShadowDepth="3"/>
             </Button.Effect>

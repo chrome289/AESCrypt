@@ -100,6 +100,7 @@ namespace Crypt
         //started a background thread to perform encrypt
         private void enc()
         {
+            st.Reset();
             st.Start();
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
@@ -154,6 +155,7 @@ namespace Crypt
             string[] g = new string[2];
             for (int y = 0; y < datagrid1.Items.Count; y++)
             {
+                bool delete = false;
                 worker.ReportProgress(0);
 
                 //parsing the file name and location
@@ -167,8 +169,10 @@ namespace Crypt
                 {
                     temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
                     g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+                    Dispatcher.Invoke(() => lb1.Content = "Packing the Folder into an archive --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
                     comp(g[0]);
                     g[0] = g[0] + ".7z";
+                    delete = true;
                 }
                 else
                 {
@@ -178,7 +182,7 @@ namespace Crypt
                 temp1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
                 Dispatcher.Invoke(() => lb1.Content = "Encrypting --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
 
-                //preparing salt and ley for encryption
+                //preparing salt and key for encryption
                 v = false;
                 byte[] salt = Encoding.ASCII.GetBytes("Some f**king salt");
                 Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
@@ -224,7 +228,13 @@ namespace Crypt
                     {
                         fss1.Close();
                     }
-                    File.Delete(g[0].Substring(0, g[0].Length - 5));
+
+                    //deleting the temp. archive
+                    if(delete==true)
+                    {
+                        delete = false;
+                        File.Delete(g[0].Substring(0, g[0].Length - 5));
+                    }
                 }
                 catch (FileNotFoundException e4)
                 {
@@ -255,6 +265,7 @@ namespace Crypt
 
         private void dec()
         {
+            st.Reset();
             st.Start();
             BackgroundWorker debw = new BackgroundWorker();
             debw.DoWork += new DoWorkEventHandler(debw_DoWork);
@@ -370,15 +381,14 @@ namespace Crypt
                         //decompressing if file is 7z archive
                         if (Path.GetExtension(g[0]) == ".7z" && decomp == true)
                         {
+                            Dispatcher.Invoke(() => lb1.Content = "Decompressing the archive --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
                             decom(g[0]);
                         }
                     }
                     else
                     {
                         if (fss1 != null)
-                        {
                             fss1.Close();
-                        }
                         go = false; 
                         String sMessageBoxText = "File Already Exists  \n\n" + g[0];
                         string sCaption = "Decryption";
@@ -579,6 +589,20 @@ namespace Crypt
         private void bt5_Click(object sender, RoutedEventArgs e)
         {
             go = false;
+            if (fs != null)
+            {
+                fs.Close();
+            }
+
+            if (fss1 != null)
+            {
+                fss1.Close();
+            }
+            if (Process.GetProcessesByName("7za").Length > 0)
+            {
+                Process p = Process.GetProcessesByName("7za")[0];
+                p.Kill();
+            }
         }
 
         private void bt6_Click(object sender, RoutedEventArgs e)
