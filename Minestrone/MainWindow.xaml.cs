@@ -224,10 +224,10 @@ namespace Crypt
                     {
                         fss1.Close();
                     }
+                    File.Delete(g[0].Substring(0, g[0].Length - 5));
                 }
                 catch (FileNotFoundException e4)
                 {
-
                     String sMessageBoxText = "File Not Found  \n\n" + g[0];
                     string sCaption = "Encryption";
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
@@ -244,7 +244,10 @@ namespace Crypt
                 }
                 finally
                 {
-                    fs = null; fss1 = null;
+                    if (fs != null)
+                        fs.Close();
+                    if (fss1 != null)
+                        fss1.Close();
                 }
             }
         }
@@ -270,7 +273,7 @@ namespace Crypt
         private void debw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             st.Stop();
-
+            
             // restoring default GUI
             pb1.Value = 0;
             datagrid1.Items.Clear();
@@ -352,6 +355,7 @@ namespace Crypt
                             fss1.Write(roundtrip, 0, roundtrip.Length);
                             worker.ReportProgress((int)(fileOffset / fac));
                         }
+
                         //closing I/O streams
                         if (fs != null)
                         {
@@ -362,7 +366,8 @@ namespace Crypt
                         {
                             fss1.Close();
                         }
-                        MessageBox.Show(g[0] + "      " + Path.GetExtension(g[0]).ToString());
+                        
+                        //decompressing if file is 7z archive
                         if (Path.GetExtension(g[0]) == ".7z" && decomp == true)
                         {
                             decom(g[0]);
@@ -370,6 +375,11 @@ namespace Crypt
                     }
                     else
                     {
+                        if (fss1 != null)
+                        {
+                            fss1.Close();
+                        }
+                        go = false; 
                         String sMessageBoxText = "File Already Exists  \n\n" + g[0];
                         string sCaption = "Decryption";
                         MessageBoxButton btnMessageBox = MessageBoxButton.OK;
@@ -379,7 +389,11 @@ namespace Crypt
                 }
                 catch (CryptographicException e1)
                 {
-                    String sMessageBoxText = "Wrong Password  or Incorrect Key Size\n\n" + e1;
+                    go = false;
+                    fss1.Close();
+                    if (File.Exists(g[0]))
+                        File.Delete(g[0]);
+                    String sMessageBoxText = "Wrong Password  or Incorrect Key Size\n\n"+g[0];
                     string sCaption = "Decryption";
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
                     MessageBoxImage icnMessageBox = MessageBoxImage.Error;
@@ -387,6 +401,7 @@ namespace Crypt
                 }
                 catch (Exception e1)
                 {
+                    go = false;
                     String sMessageBoxText = "Some Random Error  \n\n" + e1;
                     string sCaption = "Decryption";
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
@@ -594,11 +609,9 @@ namespace Crypt
         }
         public void decom(String fold)
         {
-            MessageBox.Show("flolil " + fold);
             string sourceName = "\"" + fold + "\"";
             string targetName = "\""+Path.GetDirectoryName(fold)+"\"";
             cmmdp = true;
-            MessageBox.Show("/c 7za x " + sourceName + " -o" + targetName);
             processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o" + targetName);
             processStartInfo.UseShellExecute = false;
             processStartInfo.CreateNoWindow = true;
