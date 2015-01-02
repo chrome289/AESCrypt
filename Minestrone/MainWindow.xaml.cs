@@ -367,7 +367,6 @@ namespace Crypt
                         {
                             decom(g[0]);
                         }
-                        
                     }
                     else
                     {
@@ -611,9 +610,12 @@ namespace Crypt
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            MessageBox.Show(cmmdp.ToString());
-            if (cmmdp == true)
-                x.Close();
+            if (Process.GetProcessesByName("7za").Length > 0)
+            {
+                Process p = Process.GetProcessesByName("7za")[0];
+                p.Kill();
+            }
+            Environment.Exit(0);
         }
     }
 }
