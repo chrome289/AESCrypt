@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Minestrone.Properties {
+namespace Crypt.Properties {
     using System;
     
     
