@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Crypt.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="AESCrypt"  Closing="Window_Closing"
+        Title="Minestrone"  Closing="Window_Closing"
         Height="365.948" Width="590" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Background="White" FontFamily="Tahoma" Padding="0">
     <Window.Resources>
         <Style x:Key="CenterAlignedCellStyle" TargetType="{x:Type DataGridCell}">
@@ -61,7 +61,7 @@
 
         <Button x:Name="bt3" Content="Delete Files" Margin="416,151,0,0" VerticalAlignment="Top" Click="bt3_Click"  BorderBrush="#FFC5D1CB" BorderThickness="2" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="30" HorizontalAlignment="Left" Width="85"/>
 
-        <DataGrid x:Name="datagrid1" Background="#4C2D9C83" AllowDrop="True" Drop="datagrid1_Drop" AutoGenerateColumns="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" CanUserAddRows="False" LoadingRowDetails="datagrid1_LoadingRowDetails"  LoadingRow="DataGrid_LoadingRow" HorizontalAlignment="Left"  Margin="20,26,100,40" VerticalAlignment="Top" Height="211" Width="327" FontFamily="Ebrima" GridLinesVisibility="Horizontal" SnapsToDevicePixels="False" MinColumnWidth="40" AreRowDetailsFrozen="True" FontWeight="Thin" TextOptions.TextHintingMode="Fixed" HeadersVisibility="Column" IsReadOnly="True" HorizontalGridLinesBrush="#FFFFF379" BorderBrush="#FF95AFC9" OpacityMask="Black">
+        <DataGrid x:Name="datagrid1" Background="#3F2D9C83" AllowDrop="True" Drop="datagrid1_Drop" AutoGenerateColumns="False" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" CanUserAddRows="False" LoadingRowDetails="datagrid1_LoadingRowDetails"  LoadingRow="DataGrid_LoadingRow" HorizontalAlignment="Left"  Margin="20,26,100,40" VerticalAlignment="Top" Height="211" Width="327" FontFamily="Ebrima" GridLinesVisibility="Horizontal" SnapsToDevicePixels="False" MinColumnWidth="40" AreRowDetailsFrozen="True" FontWeight="Thin" TextOptions.TextHintingMode="Fixed" HeadersVisibility="Column" IsReadOnly="True" HorizontalGridLinesBrush="#FFFFF379" BorderBrush="#FF95AFC9" OpacityMask="Black">
             <DataGrid.Effect>
                 <DropShadowEffect BlurRadius="20" Color="#FFC1BCBC" Direction="300" RenderingBias="Quality" ShadowDepth="3"/>
             </DataGrid.Effect>

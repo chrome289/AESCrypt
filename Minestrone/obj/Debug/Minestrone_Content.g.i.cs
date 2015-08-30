@@ -9,5 +9,6 @@
 //------------------------------------------------------------------------------
 
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("7za.exe")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("minestrone.exe")]
 
 

@@ -1,8 +1,4 @@
-﻿using Crypt;
-using Microsoft.Win32;
-using Ookii.Dialogs.Wpf;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,8 +6,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace Crypt {
@@ -25,7 +19,7 @@ namespace Crypt {
         public static long val, numBytesRead, fileOffset;
         public static double fac;
         public static FileStream fs = null, fss1 = null;
-        public static Stopwatch st = new Stopwatch();
+        public static Stopwatch st = new Stopwatch(); 
         public static List<String> path = new List<string>();
         public static List<String> filename = new List<string>();
         public static List<int> size = new List<int>();
@@ -37,7 +31,7 @@ namespace Crypt {
             block = 1;
             decomp = false;
             path = App.path;
-            foreach(String filepath in path) {
+            foreach (String filepath in path) {
                 FileInfo finfo = new FileInfo(filepath);
                 filename.Add(finfo.FullName);
 
@@ -45,12 +39,27 @@ namespace Crypt {
                 if ((att & FileAttributes.Directory) == FileAttributes.Directory)
                     size.Add(-1);
                 else
-                    size.Add((int)finfo.Length/1024/1024);
+                    size.Add((int)finfo.Length / 1024 / 1024);
             }
-            pass ps = new pass();
-            ps.ShowDialog();
             pwd = pass.pwd;
             passw = pass.passw;
+            if (pass.packageFiles) {
+                Directory.CreateDirectory(Path.GetDirectoryName(path[0]) + "\\" + pass.folderName);
+                String temp = "";
+                foreach (String filepath in path) {
+                    FileInfo finfo = new FileInfo(filepath);
+                    MessageBox.Show(filepath + "   " + Path.GetDirectoryName(filepath) + "\\" + pass.folderName + "\\" + Path.GetFileName(filepath));
+                    FileAttributes att = File.GetAttributes(filepath);
+                    if ((att & FileAttributes.Directory) == FileAttributes.Directory)
+                        CopyAll(new DirectoryInfo(filepath), new DirectoryInfo(Path.GetDirectoryName(filepath) + "\\" + pass.folderName + "\\" + Path.GetFileName(filepath)));
+                    else
+                        File.Copy(filepath, Path.GetDirectoryName(filepath) + "\\" + pass.folderName + "\\" + Path.GetFileName(filepath), true);
+                    
+                    temp = Path.GetDirectoryName(filepath) + "\\" + pass.folderName;
+                }
+                path.Clear(); filename.Clear(); size.Clear();
+                path.Add(temp); filename.Add(pass.folderName); size.Add(-1);
+            }
             if (passw == true) {
                 go = true;
                 if (App.whattodo)
@@ -60,8 +69,8 @@ namespace Crypt {
             }
             else
                 this.Close();
+            
         }
-
         /* To move a borderless window
          * private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -446,6 +455,20 @@ namespace Crypt {
                 p.Kill();
             }
             Environment.Exit(0);
+        }
+        public static void CopyAll(DirectoryInfo sdir, DirectoryInfo ddir) {
+            if (Directory.Exists(ddir.FullName) == false) {
+                Directory.CreateDirectory(ddir.FullName);
+            }
+            
+            foreach (FileInfo f in sdir.GetFiles()) {
+                f.CopyTo(Path.Combine(ddir.FullName, f.Name), true);
+            }
+            
+            foreach (DirectoryInfo diSourceSubDir in sdir.GetDirectories()) {
+                DirectoryInfo tdir =ddir.CreateSubdirectory(diSourceSubDir.Name);
+                CopyAll(diSourceSubDir, tdir);
+            }
         }
     }
 }

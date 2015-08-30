@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AESCrypt")]
+[assembly: AssemblyTitle("Minestrone")]
 [assembly: AssemblyDescription("Application for Encrypting and Decrypting Files with ease")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Siddharth Seth")]
-[assembly: AssemblyProduct("Crypt")]
+[assembly: AssemblyProduct("Minestrone")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -13,7 +13,7 @@
             <PasswordBox x:Name="tb1" Margin="32,0,32,20" Height="23" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  VerticalAlignment="Top" Password=""/>
             <Label Name="lb1" Content="Password must contain atleast 8 characters" HorizontalContentAlignment="Center" VerticalAlignment="Top" FontSize="10" FontStyle="Italic" FontStretch="ExtraCondensed" FontWeight="Light" Foreground="#FFFF0808" Margin="0,0" Height="41"/>
             <CheckBox x:Name="checkBox" Margin="90,0,90,0" Content="Create a new folder ?" Checked="checkBox_Checked"/>
-            <TextBox x:Name="textBox" FocusManager.GotFocus="textBox_GotFocus" FocusManager.LostFocus="textBox_LostFocus" Text="Enter Name" Margin="32,20,32,0" TextWrapping="Wrap" IsEnabled="False"/>
+            <TextBox x:Name="textBox" Text="Enter Name" Margin="32,20,32,0" TextWrapping="Wrap" IsEnabled="False"/>
             <Button x:Name="bt1" Content="Submit" Margin="90,30,90,50" VerticalAlignment="Top" Click="bt1_Click" BorderBrush="#FFC5D1CB" BorderThickness="1" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="24" FontSize="13" IsDefault="True"/>
         </StackPanel>
 

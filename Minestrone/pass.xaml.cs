@@ -7,6 +7,8 @@ namespace Crypt {
     /// </summary>
     public partial class pass : Window {
         public static String pwd = MainWindow.pwd; public static bool passw = MainWindow.passw;
+        public static bool packageFiles = false;
+        public static String folderName;
         public pass() {
             InitializeComponent();
         }
@@ -16,6 +18,9 @@ namespace Crypt {
             if (tb1.Password.Length > 7) {
                 pwd = tb1.Password;
                 passw = true;
+                folderName = textBox.Text;
+                sendTo st = new sendTo();
+                st.Show();
                 this.Close();
             }
             else {
@@ -27,18 +32,14 @@ namespace Crypt {
 
         
         private void checkBox_Checked(object sender, RoutedEventArgs e) {
-            if (checkBox.IsChecked==true)
+            if (checkBox.IsChecked == true) {
                 textBox.IsEnabled = true;
-            else
+                packageFiles = true;
+            }
+            else {
                 textBox.IsEnabled = false;
-        }
-
-        private void textBox_GotFocus(object sender, RoutedEventArgs e) {
-            textBox.Text = "";
-        }
-
-        private void textBox_LostFocus(object sender, RoutedEventArgs e) {
-            textBox.Text = "Enter Name";
+                packageFiles = false;
+            }
         }
     }
 }

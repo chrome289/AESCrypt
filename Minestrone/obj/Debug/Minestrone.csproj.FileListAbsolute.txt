@@ -20,8 +20,6 @@ C:\Users\Siddharth\Documents\Visual Studio 2013\Projects\Minestrone\Minestrone\o
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Minestrone.exe.config
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Minestrone.exe
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Minestrone.pdb
-C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Ookii.Dialogs.Wpf.xml
-C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.csprojResolveAssemblyReference.cache
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\MainWindow.baml
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\pass.baml
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\settings.baml
@@ -38,3 +36,4 @@ C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.pdb
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\sendTo.g.cs
 C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\sendTo.baml
+C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.csprojResolveAssemblyReference.cache
