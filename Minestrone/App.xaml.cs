@@ -10,7 +10,7 @@ namespace Crypt {
     /// </summary>
     public partial class App : Application {
         public static List<string> path = new List<string>();
-        public static bool whattodo;
+        public static bool whattodo,calledFromMainWin=false;
         protected override void OnStartup(StartupEventArgs e) {
             if (Minestrone.Properties.Settings.Default.firstStart) {
                 CreateShortCuts();
@@ -23,10 +23,13 @@ namespace Crypt {
                     whattodo = false;
                 for (int x = 1; x < e.Args.Length; x++)
                     path.Add(e.Args[x]);
+                calledFromMainWin = false;
                 pass ps = new pass();
                 ps.Show();
+
             }
             else {
+                calledFromMainWin = true;
                 MainWindow mw = new MainWindow();
                 mw.Show();
             }

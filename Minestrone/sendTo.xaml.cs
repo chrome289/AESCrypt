@@ -12,14 +12,14 @@ namespace Crypt {
     public partial class sendTo : Window {
         public static Process x; public static ProcessStartInfo processStartInfo;
         public static Process process;
-        public static string temp1, temp2 = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
+        public static string temp1, temp2 = "";
         public static int keysize = settings.keysize; public static int block = settings.block; public static bool decomp = settings.decomp;
         public static int blo;
         public static bool go = false, cmmdp = false, v;
         public static long val, numBytesRead, fileOffset;
         public static double fac;
         public static FileStream fs = null, fss1 = null;
-        public static Stopwatch st = new Stopwatch(); 
+        public static Stopwatch st = new Stopwatch();
         public static List<String> path = new List<string>();
         public static List<String> filename = new List<string>();
         public static List<int> size = new List<int>();
@@ -41,8 +41,6 @@ namespace Crypt {
                 else
                     size.Add((int)finfo.Length / 1024 / 1024);
             }
-            pwd = pass.pwd;
-            passw = pass.passw;
             if (pass.packageFiles) {
                 Directory.CreateDirectory(Path.GetDirectoryName(path[0]) + "\\" + pass.folderName);
                 String temp = "";
@@ -54,13 +52,13 @@ namespace Crypt {
                         CopyAll(new DirectoryInfo(filepath), new DirectoryInfo(Path.GetDirectoryName(filepath) + "\\" + pass.folderName + "\\" + Path.GetFileName(filepath)));
                     else
                         File.Copy(filepath, Path.GetDirectoryName(filepath) + "\\" + pass.folderName + "\\" + Path.GetFileName(filepath), true);
-                    
+
                     temp = Path.GetDirectoryName(filepath) + "\\" + pass.folderName;
                 }
                 path.Clear(); filename.Clear(); size.Clear();
                 path.Add(temp); filename.Add(pass.folderName); size.Add(-1);
             }
-            if (passw == true) {
+            if (pass.passw == true) {
                 go = true;
                 if (App.whattodo)
                     enc();
@@ -69,7 +67,7 @@ namespace Crypt {
             }
             else
                 this.Close();
-            
+
         }
         /* To move a borderless window
          * private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -179,7 +177,7 @@ namespace Crypt {
                 if (size[y] == -1) {
                     Dispatcher.Invoke(() => lb1.Content = "Packing the Folder into an archive --> " + Path.GetFileName(path[y]), DispatcherPriority.Send);
                     comp(path[y]);
-                    path[y]=path[y] + ".zip";
+                    path[y] = path[y] + ".zip";
                     delete = true;
                 }
                 temp1 = Path.Combine(Path.GetDirectoryName(path[y]), Path.GetFileNameWithoutExtension(path[y]));
@@ -188,13 +186,13 @@ namespace Crypt {
                 //preparing salt and key for encryption
                 v = false;
                 byte[] salt = Encoding.ASCII.GetBytes("salt to taste");
-                Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
+                Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pass.pwd, salt);
                 byte[] k = key.GetBytes(keysize / 8);
                 byte[] i = key.GetBytes(16);
                 try {
                     //opening I/O streams
                     fs = new FileStream(path[y], FileMode.Open);
-                    path[y]=path[y] + ".caes";
+                    path[y] = path[y] + ".caes";
                     fss1 = new FileStream(path[y], FileMode.Create);
                     val = 0; numBytesRead = 0; fileOffset = 0;
                     fac = fs.Length / 100.00;
@@ -300,14 +298,14 @@ namespace Crypt {
             for (int y = 0; y < path.Count; y++) {
                 try {
                     worker.ReportProgress(0);
-                    
+
                     temp1 = Path.Combine(Path.GetDirectoryName(path[y]), Path.GetFileNameWithoutExtension(path[y]));
                     Dispatcher.Invoke(() => lb1.Content = "Decrypting --> " + Path.GetFileName(path[y]), DispatcherPriority.Send);
 
                     //preparing salt and ley for encryption
                     v = false;
                     byte[] salt = Encoding.ASCII.GetBytes("salt to taste");
-                    Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
+                    Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pass.pwd, salt);
                     byte[] k = key.GetBytes(keysize / 8);
                     byte[] i = key.GetBytes(16);
 
@@ -397,9 +395,7 @@ namespace Crypt {
         private void letsdothis() {
             pass ps = new pass();
             ps.ShowDialog();
-            pwd = pass.pwd;
-            passw = pass.passw;
-            if (passw == true) {
+            if (pass.passw == true) {
                 go = true;
                 if (App.whattodo)
                     enc();
@@ -407,7 +403,7 @@ namespace Crypt {
                     dec();
             }
         }
-        
+
 
         private void bt5_Click(object sender, RoutedEventArgs e) {
             go = false;
@@ -424,14 +420,15 @@ namespace Crypt {
             }
         }
 
-       
+
         public void comp(String fold) {
             string sourceName = "\"" + fold + "\"";
             string targetName = "\"" + fold + ".zip" + "\"";
             cmmdp = true;
-            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a " + targetName + " " + sourceName + " -mx0 -tzip -mmt on");
+            processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a " + targetName + " " + sourceName + " -mx0 -tzip -mmt");
             processStartInfo.UseShellExecute = false;
             processStartInfo.CreateNoWindow = true;
+            processStartInfo.WorkingDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             process = Process.Start(processStartInfo);
             process.WaitForExit();
             cmmdp = false;
@@ -443,6 +440,7 @@ namespace Crypt {
             processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o" + targetName);
             processStartInfo.UseShellExecute = false;
             processStartInfo.CreateNoWindow = true;
+            processStartInfo.WorkingDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             process = Process.Start(processStartInfo);
             process.WaitForExit();
             File.Delete(fold);
@@ -460,13 +458,13 @@ namespace Crypt {
             if (Directory.Exists(ddir.FullName) == false) {
                 Directory.CreateDirectory(ddir.FullName);
             }
-            
+
             foreach (FileInfo f in sdir.GetFiles()) {
                 f.CopyTo(Path.Combine(ddir.FullName, f.Name), true);
             }
-            
+
             foreach (DirectoryInfo diSourceSubDir in sdir.GetDirectories()) {
-                DirectoryInfo tdir =ddir.CreateSubdirectory(diSourceSubDir.Name);
+                DirectoryInfo tdir = ddir.CreateSubdirectory(diSourceSubDir.Name);
                 CopyAll(diSourceSubDir, tdir);
             }
         }

@@ -6,7 +6,7 @@ namespace Crypt {
     /// Interaction logic for pass.xaml
     /// </summary>
     public partial class pass : Window {
-        public static String pwd = MainWindow.pwd; public static bool passw = MainWindow.passw;
+        public static String pwd ; public static bool passw;
         public static bool packageFiles = false;
         public static String folderName;
         public pass() {
@@ -19,27 +19,28 @@ namespace Crypt {
                 pwd = tb1.Password;
                 passw = true;
                 folderName = textBox.Text;
-                sendTo st = new sendTo();
-                st.Show();
+                if (!App.calledFromMainWin) {
+                    sendTo st = new sendTo();
+                    st.Show();
+                }
                 this.Close();
             }
             else {
                 //MessageBox.Show("DSFsd");
-                lb1.Content = lb1.Content + "\n\nPassword not Accepted";
+                lb1.Content = "Password not Accepted\n" + lb1.Content;
                 passw = false;
             }
         }
 
-        
+
         private void checkBox_Checked(object sender, RoutedEventArgs e) {
-            if (checkBox.IsChecked == true) {
-                textBox.IsEnabled = true;
-                packageFiles = true;
-            }
-            else {
-                textBox.IsEnabled = false;
-                packageFiles = false;
-            }
+            textBox.IsEnabled = true;
+            packageFiles = true;
+        }
+
+        private void checkBox_Unchecked(object sender, RoutedEventArgs e) {
+            textBox.IsEnabled = false;
+            packageFiles = false;
         }
     }
 }

@@ -457,10 +457,10 @@ namespace Crypt {
         }
 
         private static void AnimateWindowHeight(Window window, double x) {
-            window.BeginInit();
-            window.SizeToContent = System.Windows.SizeToContent.Height;
+            //window.BeginInit();
+            window.SizeToContent = SizeToContent.Height;
             double height = x;
-            window.SizeToContent = System.Windows.SizeToContent.Manual;
+            window.SizeToContent = SizeToContent.Manual;
             window.Dispatcher.BeginInvoke(new Action(() => {
                 DoubleAnimation heightAnimation = new DoubleAnimation();
                 heightAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.3));
@@ -469,7 +469,7 @@ namespace Crypt {
                 heightAnimation.FillBehavior = FillBehavior.HoldEnd;
                 window.BeginAnimation(Window.HeightProperty, heightAnimation);
             }), null);
-            window.EndInit();
+           // window.EndInit();
         }
 
         private void bt3_Click(object sender, RoutedEventArgs e) {
@@ -543,6 +543,7 @@ namespace Crypt {
             processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za a " + targetName + " " + sourceName + " -mx0 -tzip -mmt on");
             processStartInfo.UseShellExecute = false;
             processStartInfo.CreateNoWindow = true;
+            processStartInfo.WorkingDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             process = Process.Start(processStartInfo);
             process.WaitForExit();
             cmmdp = false;
@@ -554,6 +555,7 @@ namespace Crypt {
             processStartInfo = new ProcessStartInfo("cmd.exe", @"/c 7za x " + sourceName + " -o" + targetName);
             processStartInfo.UseShellExecute = false;
             processStartInfo.CreateNoWindow = true;
+            processStartInfo.WorkingDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             process = Process.Start(processStartInfo);
             process.WaitForExit();
             File.Delete(fold);
