@@ -40,7 +40,6 @@ C:\Users\Shreya\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Minestrone.exe.config
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Minestrone.exe
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\bin\Debug\Minestrone.pdb
-C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.csprojResolveAssemblyReference.cache
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Interop.IWshRuntimeLibrary.dll
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Interop.Shell32.dll
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.csproj.ResolveComReference.cache
@@ -60,3 +59,4 @@ C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\o
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.csproj.GenerateResource.Cache
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.exe
 C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.pdb
+C:\Users\Siddharth\Documents\Visual Studio 2015\Projects\Minestrone\Minestrone\obj\Debug\Minestrone.csprojResolveAssemblyReference.cache

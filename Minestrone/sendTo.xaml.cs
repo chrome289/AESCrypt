@@ -26,8 +26,8 @@ namespace Crypt {
 
         public sendTo() {
             InitializeComponent();
-            keysize = 256;
-            blo = 16640000;
+            keysize = 128;
+            blo = 8320000;
             block = 1;
             decomp = false;
             path = App.path;
@@ -185,7 +185,7 @@ namespace Crypt {
 
                 //preparing salt and key for encryption
                 v = false;
-                byte[] salt = Encoding.ASCII.GetBytes("salt to taste");
+                byte[] salt = Encoding.ASCII.GetBytes(pass.pwd);
                 Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pass.pwd, salt);
                 byte[] k = key.GetBytes(keysize / 8);
                 byte[] i = key.GetBytes(16);
@@ -302,9 +302,9 @@ namespace Crypt {
                     temp1 = Path.Combine(Path.GetDirectoryName(path[y]), Path.GetFileNameWithoutExtension(path[y]));
                     Dispatcher.Invoke(() => lb1.Content = "Decrypting --> " + Path.GetFileName(path[y]), DispatcherPriority.Send);
 
-                    //preparing salt and ley for encryption
+                    //preparing salt and key for encryption
                     v = false;
-                    byte[] salt = Encoding.ASCII.GetBytes("salt to taste");
+                    byte[] salt = Encoding.ASCII.GetBytes(pass.pwd);
                     Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pass.pwd, salt);
                     byte[] k = key.GetBytes(keysize / 8);
                     byte[] i = key.GetBytes(16);

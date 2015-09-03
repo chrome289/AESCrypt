@@ -12,7 +12,6 @@ namespace Crypt
         {
             InitializeComponent();
             keysize = MainWindow.keysize;
-            block = MainWindow.block;
             decomp = MainWindow.decomp;
             cb1.SelectedIndex = (keysize - 128) / 64;
             cb2.SelectedIndex = block;

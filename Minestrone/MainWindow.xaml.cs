@@ -10,24 +10,27 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.Collections.Generic;
 
 namespace Crypt {
     public partial class MainWindow : Window {
-        public static Process x; public static ProcessStartInfo processStartInfo;
-        public static Process process;
-        public static string temp1, temp2 = ""; public static String pwd = pass.pwd; public static bool passw = pass.passw;
-        public static int keysize = settings.keysize; public static int block = settings.block; public static bool decomp = settings.decomp;
-        public static int blo;
-        public static bool go = false, cmmdp = false, v;
-        public static long val, numBytesRead, fileOffset;
-        public static double fac;
-        public static FileStream fs = null, fss1 = null;
-        public static Stopwatch st = new Stopwatch();
+        static ProcessStartInfo processStartInfo;
+        static Process process;
+        static string temp1, temp2 = "";
+        public static int keysize, blo;
+        public static bool decomp = settings.decomp;
+        static bool go = false, cmmdp = false, v;
+        static long val, numBytesRead, fileOffset;
+        static double fac;
+        static FileStream fs = null, fss1 = null;
+        static Stopwatch st = new Stopwatch();
+        static List<String> path = new List<string>(),filename = new List<string>();
+        static List<int> size = new List<int>();
+
         public MainWindow() {
             InitializeComponent();
-            keysize = 256;
-            blo = 16640000;
-            block = 1;
+            keysize = 128;
+            blo = 8320000;
             decomp = false;
         }
 
@@ -133,45 +136,30 @@ namespace Crypt {
         //main background thread
         private void bw_DoWork(object sender, DoWorkEventArgs e) {
             BackgroundWorker worker = sender as BackgroundWorker;
-            string[] temp = new string[2];
-            string[] g = new string[2];
-            for (int y = 0; y < datagrid1.Items.Count; y++) {
+            for (int y = 0; y < path.Count; y++) {
                 bool delete = false;
                 worker.ReportProgress(0);
 
-                //parsing the file name and location
-                Dispatcher.Invoke(() => datagrid1.SelectedIndex++, DispatcherPriority.Send);
-                Dispatcher.Invoke(() => temp2 = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                temp = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
-                g = temp[1].Split(new string[] { " KB" }, StringSplitOptions.None);
-
                 //zip if selection is a folder
-                if (g[0] == " -1") {
-                    temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
-                    g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
-                    Dispatcher.Invoke(() => lb1.Content = "Packing the Folder into an archive --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
-                    comp(g[0]);
-                    g[0] = g[0] + ".zip";
+                if (size[y] == -1) {
+                    Dispatcher.Invoke(() => lb1.Content = "Packing the Folder into an archive --> " + filename[y], DispatcherPriority.Send);
+                    comp(path[y]);
+                    path[y] = path[y] + ".zip";
                     delete = true;
                 }
-                else {
-                    temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
-                    g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
-                }
-                temp1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
-                Dispatcher.Invoke(() => lb1.Content = "Encrypting --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
+                Dispatcher.Invoke(() => lb1.Content = "Encrypting --> " + filename[y], DispatcherPriority.Send);
 
                 //preparing salt and key for encryption
                 v = false;
-                byte[] salt = Encoding.ASCII.GetBytes("salt to taste");
-                Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
+                byte[] salt = Encoding.ASCII.GetBytes(pass.pwd);
+                Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pass.pwd, salt);
                 byte[] k = key.GetBytes(keysize / 8);
                 byte[] i = key.GetBytes(16);
                 try {
                     //opening I/O streams
-                    fs = new FileStream(g[0], FileMode.Open);
-                    g[0] = g[0] + ".caes";
-                    fss1 = new FileStream(g[0], FileMode.Create);
+                    fs = new FileStream(path[y], FileMode.Open);
+                    path[y] = path[y] + ".caes";
+                    fss1 = new FileStream(path[y], FileMode.Create);
                     val = 0; numBytesRead = 0; fileOffset = 0;
                     fac = fs.Length / 100.00;
 
@@ -206,11 +194,11 @@ namespace Crypt {
                     //deleting the temp. archive
                     if (delete == true) {
                         delete = false;
-                        File.Delete(g[0].Substring(0, g[0].Length - 5));
+                        File.Delete(path[y].Substring(0, path[y].Length - 5));
                     }
                 }
                 catch (FileNotFoundException e4) {
-                    String sMessageBoxText = "File Not Found  \n\n" + g[0];
+                    String sMessageBoxText = "File Not Found  \n\n" + path[y];
                     string sCaption = "Encryption";
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
                     MessageBoxImage icnMessageBox = MessageBoxImage.Error;
@@ -277,35 +265,25 @@ namespace Crypt {
 
         private void debw_DoWork(object sender, DoWorkEventArgs e) {
             BackgroundWorker worker = sender as BackgroundWorker;
-            string[] temp = new string[2]; string[] g = new string[2];
-            for (int y = 0; y < datagrid1.Items.Count; y++) {
+
+            for (int y = 0; y < path.Count; y++) {
                 try {
                     worker.ReportProgress(0);
 
-                    //parsing the file name and location
-                    Dispatcher.Invoke(() => datagrid1.SelectedIndex++, DispatcherPriority.Send);
-                    Dispatcher.Invoke(() => temp2 = datagrid1.SelectedItem.ToString(), DispatcherPriority.Send);
-                    temp = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
-                    g = temp[1].Split(new string[] { " KB" }, StringSplitOptions.None);
+                    Dispatcher.Invoke(() => lb1.Content = "Decrypting --> " + Path.GetFileName(filename[y]), DispatcherPriority.Send);
 
-                    //zip if selection is a folder
-                    temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
-                    g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
-                    temp1 = Path.Combine(Path.GetDirectoryName(g[0]), Path.GetFileNameWithoutExtension(g[0]));
-                    Dispatcher.Invoke(() => lb1.Content = "Decrypting --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
-
-                    //preparing salt and ley for encryption
+                    //preparing salt and key for encryption
                     v = false;
-                    byte[] salt = Encoding.ASCII.GetBytes("salt to taste");
-                    Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pwd, salt);
+                    byte[] salt = Encoding.ASCII.GetBytes(pass.pwd);
+                    Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(pass.pwd, salt);
                     byte[] k = key.GetBytes(keysize / 8);
                     byte[] i = key.GetBytes(16);
 
                     //opening I/O streams
-                    fs = new FileStream(g[0], FileMode.Open);
-                    g[0] = g[0].Remove(g[0].Length - 5);
-                    if (!File.Exists(g[0])) {
-                        fss1 = new FileStream(g[0], FileMode.Create);
+                    fs = new FileStream(path[y], FileMode.Open);
+                    path[y] = path[y].Remove(path[y].Length - 5);
+                    if (!File.Exists(path[y])) {
+                        fss1 = new FileStream(path[y], FileMode.Create);
                         val = 0; numBytesRead = 0; fileOffset = 0;
                         fac = fs.Length / 100.00;
 
@@ -336,16 +314,16 @@ namespace Crypt {
                         }
 
                         //decompressing if file is zip archive
-                        if (Path.GetExtension(g[0]) == ".zip" && decomp == true) {
-                            Dispatcher.Invoke(() => lb1.Content = "Decompressing the archive --> " + Path.GetFileName(g[0]), DispatcherPriority.Send);
-                            decom(g[0]);
+                        if (Path.GetExtension(path[y]) == ".zip" && decomp == true) {
+                            Dispatcher.Invoke(() => lb1.Content = "Decompressing the archive --> " + Path.GetFileName(path[y]), DispatcherPriority.Send);
+                            decom(path[y]);
                         }
                     }
                     else {
                         if (fss1 != null)
                             fss1.Close();
                         go = false;
-                        String sMessageBoxText = "File Already Exists  \n\n" + g[0];
+                        String sMessageBoxText = "File Already Exists  \n\n" + path[y];
                         string sCaption = "Decryption";
                         MessageBoxButton btnMessageBox = MessageBoxButton.OK;
                         MessageBoxImage icnMessageBox = MessageBoxImage.Error;
@@ -355,9 +333,9 @@ namespace Crypt {
                 catch (CryptographicException e1) {
                     go = false;
                     fss1.Close();
-                    if (File.Exists(g[0]))
-                        File.Delete(g[0]);
-                    String sMessageBoxText = "Wrong Password  or Incorrect Key Size\n\n" + g[0];
+                    if (File.Exists(path[y]))
+                        File.Delete(path[y]);
+                    String sMessageBoxText = "Wrong Password  or Incorrect Key Size\n\n" + path[y];
                     string sCaption = "Decryption";
                     MessageBoxButton btnMessageBox = MessageBoxButton.OK;
                     MessageBoxImage icnMessageBox = MessageBoxImage.Error;
@@ -390,11 +368,14 @@ namespace Crypt {
             ofd.RestoreDirectory = true;
             ofd.Multiselect = true;
             if (rb1.IsChecked == true) {
-                ofd.Title = "Please Select Source File(s) for Encryption";
+                ofd.Title = "Please Select File(s) for Encryption";
+            }
+            else if(rb2.IsChecked== true) {
+                ofd.Filter = "CAES Files|*.caes";
+                ofd.Title = "Please Select File(s) for Decryption";
             }
             else {
-                ofd.Filter = "CAES Files|*.caes";
-                ofd.Title = "Please Select Source File(s) for Decryption";
+                ofd.Title = "Please Select File(s) for Shredding";
             }
             if (ofd.ShowDialog() == true) {
                 int v = 0, h; h = datagrid1.Items.Count;
@@ -403,7 +384,7 @@ namespace Crypt {
                     if ((myStream = ofd.OpenFile()) != null) {
                         using (myStream) {
                             FileInfo info = new FileInfo(file);
-                            datagrid1.Items.Add(new { Col1 = h, Col2 = Path.GetFileName(file), Col3 = file, Col4 = info.Length / 1024 + " KB" });
+                            datagrid1.Items.Add(new { Col1 = h, Col2 = Path.GetFileName(file), Col3 = file, Col4 = Math.Round((double)(info.Length / 1024.0 / 1024.0), 3) + " MB" });
                         }
                     }
                 }
@@ -411,29 +392,109 @@ namespace Crypt {
         }
 
         private void bt2_Click_1(object sender, RoutedEventArgs e) {
-            if (rb1.IsChecked == true) {
-                pass ps = new pass();
-                ps.ShowDialog();
-                pwd = pass.pwd;
-                passw = pass.passw;
-                if (passw == true) {
-                    go = true;
-                    bt1.IsEnabled = false; bt2.IsEnabled = false; bt3.IsEnabled = false; bt4.IsEnabled = false;
-                    AnimateWindowHeight(this, 490.994);
-                    enc();
+
+            pass ps = new pass();
+            ps.ShowDialog();
+            if (pass.passw == true) {
+                go = true;
+                bt1.IsEnabled = false; bt2.IsEnabled = false; bt3.IsEnabled = false; bt4.IsEnabled = false;
+
+                //preparing arraylists
+                path.Clear();filename.Clear();size.Clear();
+                String[] temp, g;
+                for (int x = 0; x < datagrid1.Items.Count; x++) {
+                    datagrid1.SelectedIndex++;
+                    temp2 = datagrid1.SelectedItem.ToString();
+
+                    temp = temp2.Split(new string[] { "Col4 =" }, StringSplitOptions.None);
+                    g = temp[1].Split(new string[] { " KB" }, StringSplitOptions.None);
+                    temp = temp2.Split(new string[] { "Col3 = " }, StringSplitOptions.None);
+                    g = temp[1].Split(new string[] { ", Col4 =" }, StringSplitOptions.None);
+
+                    path.Add(g[0]);
+                    filename.Add(Path.GetFileName(g[0]));
+                    FileAttributes att = File.GetAttributes(g[0]);
+                    if ((att & FileAttributes.Directory) == FileAttributes.Directory)
+                        size.Add(-1);
+                    else
+                        size.Add((int)new FileInfo(g[0]).Length);
                 }
+
+                AnimateWindowHeight(this, 490.994);
+                if (rb1.IsChecked == true)
+                    enc();
+                else if (rb2.IsChecked == true)
+                    dec();
+                else
+                    shredder();
+            }
+        }
+
+        private void shredder() {
+            st.Reset();
+            st.Start();
+            BackgroundWorker shbw = new BackgroundWorker();
+            shbw.DoWork += new DoWorkEventHandler(shredderBW);
+            shbw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(shredderBW_RunWorkerCompleted);
+            shbw.ProgressChanged += new ProgressChangedEventHandler(shredderBW_ProgressChanged);
+            shbw.WorkerReportsProgress = true;
+            shbw.WorkerSupportsCancellation = true;
+            shbw.RunWorkerAsync();
+        }
+        private void shredderBW_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+            pb1.Value = e.ProgressPercentage;
+        }
+
+        private void shredderBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            st.Stop();
+
+            // restoring default GUI
+            pb1.Value = 0;
+            datagrid1.Items.Clear();
+            AnimateWindowHeight(this, 365.948);
+            lb1.Content = "";
+            bt1.IsEnabled = true; bt2.IsEnabled = true; bt3.IsEnabled = true; bt4.IsEnabled = true;
+            if (go == true) {
+                String sMessageBoxText = "Shredding Complete \n\n" + "Time Taken " + st.ElapsedMilliseconds / 1000 + " seconds";
+                string sCaption = "Shredding";
+                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
+                MessageBoxImage icnMessageBox = MessageBoxImage.Information;
+                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
             }
             else {
-                pass ps = new pass();
-                ps.ShowDialog();
-                pwd = pass.pwd;
-                passw = pass.passw;
-                if (passw == true) {
-                    go = true;
-                    bt1.IsEnabled = false; bt2.IsEnabled = false; bt3.IsEnabled = false; bt4.IsEnabled = false;
-                    AnimateWindowHeight(this, 490.994);
-                    dec();
+                String sMessageBoxText = "Shredding Interrupted";
+                string sCaption = "Shredding";
+                MessageBoxButton btnMessageBox = MessageBoxButton.OK;
+                MessageBoxImage icnMessageBox = MessageBoxImage.Error;
+                MessageBoxResult rsltMessageBox = MessageBox.Show(sMessageBoxText, sCaption, btnMessageBox, icnMessageBox);
+            }
+            GC.Collect();
+        }
+
+        private void shredderBW(object sender, DoWorkEventArgs e) {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            for (int y = 0; y < path.Count; y++) {
+                Dispatcher.Invoke(() => lb1.Content = "Shredding --> " + Path.GetFileName(filename[y]), DispatcherPriority.Send);
+                FileStream soDead = new FileStream(path[y], FileMode.Open, FileAccess.ReadWrite);
+                int bufferSize = 4096, cap = (int)soDead.Length,noOfPasses=3;
+                byte[] garbage = new byte[bufferSize];
+                Random ran = new Random(1000000);
+                for (int i = 0; i < noOfPasses; i++) {
+                    for (int x = 0; x < cap; x += bufferSize) {
+                        ran.NextBytes(garbage);
+                        soDead.Write(garbage, 0, bufferSize);
+                        soDead.Seek(x + bufferSize, SeekOrigin.Begin);
+                        soDead.Flush();
+                        worker.ReportProgress(((i * (x / bufferSize)) / noOfPasses * (cap / bufferSize)) / 100);
+                    }
+
                 }
+                soDead.Close();soDead.Dispose();
+                String randomName = "";
+                for (int x = 0; x < 10; x++)
+                    randomName += (char)ran.Next(65, 90);
+                File.Move(path[y], Environment.SpecialFolder.ApplicationData + randomName);
+                File.Delete(Environment.SpecialFolder.ApplicationData + randomName);
             }
         }
 
@@ -469,7 +530,7 @@ namespace Crypt {
                 heightAnimation.FillBehavior = FillBehavior.HoldEnd;
                 window.BeginAnimation(Window.HeightProperty, heightAnimation);
             }), null);
-           // window.EndInit();
+            // window.EndInit();
         }
 
         private void bt3_Click(object sender, RoutedEventArgs e) {
@@ -483,6 +544,11 @@ namespace Crypt {
             e.Row.Height = 30;
         }
 
+        private void rb3_Checked(object sender, RoutedEventArgs e) {
+            datagrid1.Items.Clear();
+            bt6.IsEnabled = false;
+        }
+
         private void datagrid1_LoadingRowDetails(object sender, DataGridRowDetailsEventArgs e) {
 
         }
@@ -491,7 +557,6 @@ namespace Crypt {
             settings set = new settings();
             set.ShowDialog();
             keysize = settings.keysize;
-            block = settings.block;
             decomp = settings.decomp;
             blo = 166400 * (int)(Math.Pow(10, settings.block + 1));
 
@@ -504,7 +569,7 @@ namespace Crypt {
                 foreach (String file in files) {
                     v++; h++;
                     FileInfo info = new FileInfo(file);
-                    datagrid1.Items.Add(new { Col1 = h, Col2 = Path.GetFileName(file), Col3 = file, Col4 = info.Length / 1024 + " KB" });
+                    datagrid1.Items.Add(new { Col1 = h, Col2 = Path.GetFileName(file), Col3 = file, Col4 = Math.Round((double)(info.Length / 1024.0 / 1024.0), 3) + " MB" });
                 }
             }
         }

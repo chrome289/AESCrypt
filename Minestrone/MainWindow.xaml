@@ -27,7 +27,7 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="#4A4D49"/>
+            <Setter Property="Background" Value="Gray"/>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#FF262626"/>
@@ -51,9 +51,11 @@
         </Border>
 
         <Button x:Name="bt1" Content="Add Files" Margin="416,98,0,0" VerticalAlignment="Top" Click="Button_Click" BorderBrush="#FFC5D1CB" BorderThickness="2" FontFamily="Ebrima" ClickMode="Press" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Height="30" HorizontalAlignment="Left" Width="85"/>
-        <RadioButton x:Name="rb1" Content="Encryption" HorizontalAlignment="Left" Margin="416,222,0,0" VerticalAlignment="Top" IsChecked="True" Checked="rb1_Checked" Width="85" FontFamily="Ebrima"/>
+        
+        <RadioButton x:Name="rb1" Content="Encryption" HorizontalAlignment="Left" Margin="416,210,0,0" VerticalAlignment="Top" IsChecked="True" Checked="rb1_Checked" Width="85" FontFamily="Ebrima"/>
 
-        <RadioButton x:Name="rb2" Content="Decryption" HorizontalAlignment="Left" Margin="416,253,0,0" VerticalAlignment="Top" Checked="rb2_Checked" Width="85" FontFamily="Ebrima"/>
+        <RadioButton x:Name="rb2" Content="Decryption" HorizontalAlignment="Left" Margin="416,235,0,0" VerticalAlignment="Top" Checked="rb2_Checked" Width="85" FontFamily="Ebrima"/>
+        <RadioButton x:Name="rb3" Content="Shred File" HorizontalAlignment="Left" Margin="416,260,0,0" VerticalAlignment="Top" Checked="rb3_Checked" Width="85" FontFamily="Ebrima"/>
 
         <ProgressBar x:Name="pb1" Height="18" Margin="40,401,39,-82" VerticalAlignment="Top" FontFamily="Ebrima" FontSize="13"/>
 
